@@ -31,4 +31,6 @@ public class Address extends BaseEntity {
     private String zipCode;
 
 
+
+
 }

@@ -112,8 +112,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDetailsDto findByUsername(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new ServiceException(UserError.USER_NOT_FOUND);
+        }
+
         return Mapper.map(userRepository.findByUsername(username), UserDetailsDto.class);
     }
 
