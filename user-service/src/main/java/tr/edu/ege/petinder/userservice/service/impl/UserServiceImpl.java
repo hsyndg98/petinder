@@ -6,24 +6,35 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import tr.edu.ege.petinder.userservice.dto.UserCreationDto;
 import tr.edu.ege.petinder.userservice.dto.UserDetailsDto;
+import tr.edu.ege.petinder.userservice.exceptions.AddressDtoError;
 import tr.edu.ege.petinder.userservice.exceptions.ServiceException;
 import tr.edu.ege.petinder.userservice.exceptions.UserError;
+import tr.edu.ege.petinder.userservice.model.RoleType;
 import tr.edu.ege.petinder.userservice.model.User;
+import tr.edu.ege.petinder.userservice.repository.RoleRepository;
 import tr.edu.ege.petinder.userservice.repository.UserRepository;
 import tr.edu.ege.petinder.userservice.service.UserService;
 import tr.edu.ege.petinder.userservice.util.Mapper;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private PasswordEncoder passwordEncoder;
 
 
     @Override
@@ -31,7 +42,7 @@ public class UserServiceImpl implements UserService {
         Page<User> users = userRepository.findAll(pageable);
         return new PageImpl<>(users.getContent().stream().map(user ->
                         Mapper.map(user, UserDetailsDto.class)
-                /*UserDetailsDto.builder()
+               /* UserDetailsDto.builder()
                         .bio(user.getBio())
                         .email(user.getEmail())
                         .id(user.getId())
@@ -48,6 +59,9 @@ public class UserServiceImpl implements UserService {
                         .build()*/
         ).collect(Collectors.toList()), users.getPageable(), users.getTotalElements());
     }
+    public User saveOneUser(User newUser) {
+        return userRepository.save(newUser);
+    }
 
     @Override
     public UserDetailsDto createUser(UserCreationDto user) {
@@ -58,7 +72,37 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new ServiceException(UserError.USER_EMAIL_ALREADY_REGISTERED);
         }
+
+        Set<String> strRoles= user.getRole();
+        Set<String> roles = new HashSet<>();
+
+        if (strRoles == null) {
+            String userRole =  roleRepository.findByName(RoleType.ROLE_USER).toString();
+
+            roles.add(userRole);
+        } else {
+            strRoles.forEach(role -> {
+                switch (role) {
+                    case "admin":
+                        String adminRole =  roleRepository.findByName(RoleType.ROLE_ADMIN).toString();
+
+                        roles.add(adminRole);
+
+                        break;
+
+                    default:
+                        String userRole =  roleRepository.findByName(RoleType.ROLE_USER).toString();
+
+                        roles.add(userRole);
+                }
+            });
+        }
+
+     user.setRole(roles);
+
+
         User newUser = userRepository.save(Mapper.map(user, User.class));
+
         return Mapper.map(newUser, UserDetailsDto.class);
 
     }
@@ -118,6 +162,19 @@ public class UserServiceImpl implements UserService {
         }
 
         return Mapper.map(userRepository.findByUsername(username), UserDetailsDto.class);
+    }
+
+     boolean isFullOfNulls(Object o) {
+        boolean allNull = true;
+        try {
+            for (Field f : o.getClass().getDeclaredFields()){
+                allNull &= f.get(o) == null;
+            }
+        } catch (IllegalAccessException ignored) {
+            return true;
+        }
+
+        return allNull;
     }
 
 

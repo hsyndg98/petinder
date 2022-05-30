@@ -1,8 +1,6 @@
 package tr.edu.ege.petinder.userservice.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import tr.edu.ege.petinder.userservice.model.Pet;
 import tr.edu.ege.petinder.userservice.model.Role;
 
@@ -12,6 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
+
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserCreationDto {
@@ -43,6 +42,8 @@ public class UserCreationDto {
     @Size(min = 11, max = 11)
     @Pattern(regexp = "^[0-9]*$", message = "Phone number must be 11 digits")
     private String phoneNumber;
+
+    private Set<String> role;
 
     @NotNull
     @NotEmpty

@@ -1,15 +1,21 @@
 package tr.edu.ege.petinder.userservice.security;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import tr.edu.ege.petinder.userservice.model.User;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 
 public class MyUserDetails implements UserDetails {
     private Long id;
@@ -19,13 +25,10 @@ public class MyUserDetails implements UserDetails {
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
 
-    public MyUserDetails(Long id, String username, String email, String password, Collection<? extends GrantedAuthority> authorities) {
-        this.id = id;
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.authorities = authorities;
-    }
+
+
+
+
 
     public static MyUserDetails create(User user) {
         List<GrantedAuthority> authorities=user
@@ -33,46 +36,36 @@ public class MyUserDetails implements UserDetails {
                 .stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName().name()))
                 .collect(Collectors.toList());
-        return  new MyUserDetails(user.getId(),user.getUsername(),user.getEmail(),user.getPassword(),authorities);
+        return  new MyUserDetails(user.getId(),user.getUsername(),user.getEmail(), user.getPassword(),authorities);
     }
+//    public static JwtUserDetails create(User user) {
+//        List<GrantedAuthority> authoritiesList = new ArrayList<>();
+//        authoritiesList.add(new SimpleGrantedAuthority("user"));
+//        return new JwtUserDetails(user.getId(), user.getUserName(), user.getPassword(), authoritiesList);
+//    }
 
-    public Long getId() {
-        return id;
-    }
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
-    }
 
-    @Override
-    public String getPassword() {
-        return this.password;
-    }
 
-    @Override
-    public String getUsername() {
-        return this.username;
-    }
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
     }
     @Override
     public boolean equals(Object o) {

@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -21,19 +22,23 @@ import tr.edu.ege.petinder.userservice.service.impl.MyUserDetailServiceImpl;
 )
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
-    MyUserDetailServiceImpl myUserDetailServiceImpl;
+    UserDetailsService myUserDetailServiceImpl;
 
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
 
     @Bean
     public JwtTokenFilter authenticationJwtTokenFilter() {
+
         return new JwtTokenFilter();
     }
 
     @Override
-    public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-        authenticationManagerBuilder.userDetailsService( myUserDetailServiceImpl).passwordEncoder(passwordEncoder());
+    //Hangi authentication işlemini yapcağın konfirigasyon ayaralarını burada yapıyoruz in mememory or database
+    protected void configure(AuthenticationManagerBuilder authenticationManagerBuilder)
+            throws Exception {
+        authenticationManagerBuilder.userDetailsService(
+                myUserDetailServiceImpl).passwordEncoder(passwordEncoder());
     }
 
     @Bean
@@ -44,17 +49,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
+
         return new BCryptPasswordEncoder();
     }
 
+
     @Override
+    //Hangi end pointe kim ulaşacak bunun konfirigasyonu
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeRequests().antMatchers("/api/auth/**").permitAll()
-                .antMatchers("/api/test/**").permitAll()
-                .anyRequest().authenticated();
+                .authorizeRequests()
+                .antMatchers("/api/v1/auth/**").permitAll()
+                .anyRequest()
+                .authenticated();
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }

@@ -22,7 +22,6 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
 @MappedSuperclass
 public class BaseEntity {
     @Id

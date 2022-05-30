@@ -1,8 +1,8 @@
 package tr.edu.ege.petinder.userservice.service;
 
-import tr.edu.ege.petinder.userservice.model.Role;
+import tr.edu.ege.petinder.userservice.model.RoleType;
 
 public interface RoleService {
-    Role findByName(String name);
+    String findByName(RoleType name);
 
 }
