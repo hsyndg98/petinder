@@ -1,5 +1,6 @@
 package tr.edu.ege.petinder.userservice.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import tr.edu.ege.petinder.userservice.repository.RoleRepository;
 import tr.edu.ege.petinder.userservice.repository.UserRepository;
 import tr.edu.ege.petinder.userservice.security.JwtTokenProvider;
 import tr.edu.ege.petinder.userservice.security.MyUserDetails;
+import tr.edu.ege.petinder.userservice.service.UserService;
 import tr.edu.ege.petinder.userservice.service.impl.UserServiceImpl;
 import tr.edu.ege.petinder.userservice.util.Mapper;
 
@@ -32,23 +34,11 @@ import java.util.stream.Collectors;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1/auth")
+@RequiredArgsConstructor
 public class AuthController {
-    @Autowired
-    AuthenticationManager authenticationManager;
-
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    RoleRepository roleRepository;
-
-    @Autowired
-    PasswordEncoder encoder;
-
-    @Autowired
-    JwtTokenProvider jwtTokenProvider;
-    @Autowired
-    UserServiceImpl userServiceImpl;
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final UserService userService;
 
     @PostMapping("/login")
     public AuthResponse login(@RequestBody LoginRequest loginRequest) {
@@ -56,16 +46,15 @@ public class AuthController {
         Authentication auth = authenticationManager.authenticate(authToken);
         SecurityContextHolder.getContext().setAuthentication(auth);
         String jwtToken = jwtTokenProvider.generateJwtToken(auth);
-        UserDetailsDto user = userServiceImpl.findByUsername(loginRequest.getUsername());
+        UserDetailsDto user = userService.findByUsername(loginRequest.getUsername());
         AuthResponse authResponse = new AuthResponse();
-        authResponse.setAccessToken("Bearer " + jwtToken);
-        //  authResponse.setRefreshToken(refreshTokenService.createRefreshToken(user));
+        authResponse.setAccessToken(jwtToken);
         authResponse.setUserId(user.getId());
         return authResponse;
     }
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody UserCreationDto signUpRequest) {
-        userServiceImpl.createUser(signUpRequest);
+    public ResponseEntity<String> registerUser(@Valid @RequestBody UserCreationDto signUpRequest) {
+        userService.createUser(signUpRequest);
         return  ResponseEntity.ok("User registered succesfully");
     }
 

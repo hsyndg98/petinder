@@ -19,6 +19,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ServiceException.class)
     public ResponseEntity<ErrorResponse> handleServiceException(ServiceException ex, HttpServletRequest request) {
         ApiError apiError = ex.getApiError();
+        log.error("exception thrown: ", ex);
         return ResponseEntity.status(apiError.getStatus()).body(ErrorResponse.builder()
                 .message(apiError.getMessage())
                 .path(request.getContextPath())
@@ -30,6 +31,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
                                                                HttpHeaders headers, HttpStatus status,
                                                                WebRequest request) {
+        log.error("exception thrown: ", ex);
         return ResponseEntity.status(status.value()).body(ErrorResponse.builder()
                 .message(ex.getMessage())
                 .path(request.getContextPath())
