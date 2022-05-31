@@ -2,6 +2,7 @@ package tr.edu.ege.petinder.userservice.service.impl;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +35,7 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
 
@@ -99,7 +101,7 @@ public class UserServiceImpl implements UserService {
         }
 
      user.setRole(roles);
-
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         User newUser = userRepository.save(Mapper.map(user, User.class));
 

@@ -63,33 +63,38 @@ public class AuthController {
         authResponse.setUserId(user.getId());
         return authResponse;
     }
-
-
-
-
-
-
-    @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody User user) {
-        AuthResponse authResponse = new AuthResponse();
-//        if(userServiceImpl.findByUsername(registerRequest.getUserName())) {
-//            authResponse.setMessage("Username already in use.");
-//            return new ResponseEntity<>(authResponse, HttpStatus.BAD_REQUEST);
-//        }
-        user.setPassword(encoder.encode(user.getPassword()));
-
-        userServiceImpl.saveOneUser(user);
-
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
-        Authentication auth = authenticationManager.authenticate(authToken);
-        SecurityContextHolder.getContext().setAuthentication(auth);
-        String jwtToken = jwtTokenProvider.generateJwtToken(auth);
-
-        authResponse.setMessage("User successfully registered.");
-        authResponse.setAccessToken("Bearer " + jwtToken);
-        //authResponse.setRefreshToken(refreshTokenService.createRefreshToken(user));
-
-        return new ResponseEntity<>(authResponse, HttpStatus.CREATED);
+    @PostMapping("/signup")
+    public ResponseEntity<?> registerUser(@Valid @RequestBody UserCreationDto signUpRequest) {
+        userServiceImpl.createUser(signUpRequest);
+        return  ResponseEntity.ok("User registered succesfully");
     }
+
+
+
+
+
+
+//    @PostMapping("/register")
+//    public ResponseEntity<AuthResponse> register(@RequestBody User user) {
+//        AuthResponse authResponse = new AuthResponse();
+////        if(userServiceImpl.findByUsername(registerRequest.getUserName())) {
+////            authResponse.setMessage("Username already in use.");
+////            return new ResponseEntity<>(authResponse, HttpStatus.BAD_REQUEST);
+////        }
+//        user.setPassword(encoder.encode(user.getPassword()));
+//
+//        userServiceImpl.saveOneUser(user);
+//
+//        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
+//        Authentication auth = authenticationManager.authenticate(authToken);
+//        SecurityContextHolder.getContext().setAuthentication(auth);
+//        String jwtToken = jwtTokenProvider.generateJwtToken(auth);
+//
+//        authResponse.setMessage("User successfully registered.");
+//        authResponse.setAccessToken("Bearer " + jwtToken);
+//        //authResponse.setRefreshToken(refreshTokenService.createRefreshToken(user));
+//
+//        return new ResponseEntity<>(authResponse, HttpStatus.CREATED);
+//    }
 
 }
