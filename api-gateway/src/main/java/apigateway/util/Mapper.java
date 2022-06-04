@@ -1,4 +1,4 @@
-package apigateway;
+package apigateway.util;
 
 import org.modelmapper.ModelMapper;
 
