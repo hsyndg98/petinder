@@ -36,14 +36,11 @@ public class User {
 
     @Column(nullable = false)
     private String password;
-
     @CreationTimestamp
     @CreatedDate
-    @Builder.Default
-    private Date createdAt = new Date();
+    private Date createdDate;
 
     @UpdateTimestamp
     @LastModifiedDate
-    @Builder.Default
-    private Date updatedAt = new Date();
+    private Date updatedDate;
 }

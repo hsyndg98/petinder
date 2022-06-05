@@ -18,6 +18,7 @@ import tr.edu.ege.petinder.apigateway.repository.UserRepository;
 import tr.edu.ege.petinder.apigateway.security.JwtUtils;
 import tr.edu.ege.petinder.apigateway.security.MyUserDetails;
 import tr.edu.ege.petinder.apigateway.services.AuthenticationService;
+import tr.edu.ege.petinder.apigateway.util.Mapper;
 
 @Service
 @RequiredArgsConstructor
@@ -61,6 +62,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .password(encoder.encode(signUpRequest.getPassword()))
                 .build();
         user = userRepository.save(user);
-        return UserDto.of(user);
+        return Mapper.map(user,UserDto.class);
     }
 }
