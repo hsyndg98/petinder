@@ -1,9 +1,6 @@
 package tr.edu.ege.petinder.matchingservice.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -20,19 +17,33 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder //
+@SuperBuilder
 @MappedSuperclass
-public class BaseEntity {
+public class Relation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private Long petOwnerId;
+
+    private Long requesterId;
+
+
+    private boolean isApproved;
+
+    @Builder.Default()
+    private boolean isReplied=false;
+
+    @Builder.Default
+    private boolean isDone=false;
+
     @CreationTimestamp
     @CreatedDate
     private Date createdAt;
 
-    @UpdateTimestamp
+
     @LastModifiedDate
+    @UpdateTimestamp
     private Date updatedAt;
 }
