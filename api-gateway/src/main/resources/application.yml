@@ -23,4 +23,23 @@ spring:
           format_sql: true
           globally_quoted_identifiers: true
 
+zuul:
+  ignoredServices: "*"
+  routes:
+    user-service:
+      stripPrefix: true
+      serviceId: PETFINDER-USER-SERVICE
+      path: /user/**
+      url: http://localhost:8081/v1/api
+    animal-service:
+      stripPrefix: true
+      serviceId: PETFINDER-ANIMAL-SERVICE
+      path: /animal/**
+      url: http://localhost:8084/v1/api
+    matching-service:
+        stripPrefix: true
+        serviceId: PETFINDER-MATCHING-SERVICE
+        path: /match/**
+        url: http://localhost:8085/v1/api
 
+  strip-prefix: true
